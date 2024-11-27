@@ -14,13 +14,14 @@ def saludoatodos():
 def sobremi():
     return "<marquee><h1> orquidea.rivera@uabc.edu.mx </h1></marquee>"
 
+
 @app.route("/grafica")
 def grafica():
     import pandas as pd
     import matplotlib.pyplot as plt
 
     # Cargar el archivo Excel
-    archivo_excel = 'NASCAR.xlsx'  # Cambia esto si el archivo está en otra ubicación
+    archivo_excel = ("C:/Users/fredo/datapy/flaskpage/NASCAR.xlsx")  # Cambia esto si el archivo está en otra ubicación
     df = pd.read_excel(archivo_excel)
 
     # 1. Cantidad total de puntos por cada fabricante
@@ -78,11 +79,56 @@ def grafica():
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     # Guardar la grafica en un archivo (En este caso, PNG)
-    plt.savefig('.\static\images\grafica.png')
+    plt.savefig('C:/Users/fredo/datapy/flaskpage/static/images/grafica.png')
 
     # Mostrar la gráfica
     plt.show()
     return render_template("grafica.html")
 
+@app.route("/fractalg")
+def fractalg():
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    archivo_excel = ("C:/Users/fredo/datapy/flaskpage/Datosnormal.xlsx")
+    df = pd.read_excel(archivo_excel)
 
+    Lenguague = df.groupby('Genre')['Lenguague'].sum().head(10)  # Limitar a los primeros 10
+    nombre = df.loc[df['Artist_Name'].idxmax()]
+    Popularidad = df['Popularity'].mean()
+    track = df.groupby('Track_Name')['Genre'].sum().head(10)  # Limitar a los primeros 10
+    Energia = df[df['Popularity'] > 0]['Energy'].nunique()
 
+    print("Total de puntos por género:\n", Lenguague)
+    print("\nArtista con mayor puntaje:\n", nombre)
+    print("\nPromedio de popularidad:\n", Popularidad)
+    print("\nTotal de puntos por pista:\n", track)
+    print("\nNúmero de artistas que han ganado al menos una carrera:\n", Energia)
+
+    fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+    fig.suptitle('Análisis del Top 50 2019', fontsize=18)
+
+    axs[0, 0].bar(Lenguague.index, Lenguague.values, color='skyblue')
+    axs[0, 0].set_title('Cantidad de Puntos por Género')
+    axs[0, 0].set_xlabel('Género')
+    axs[0, 0].set_ylabel('Total de Puntos')
+
+    axs[0, 1].bar(track.index.astype(str), track.values, color='salmon')
+    axs[0, 1].set_title('Cantidad Total de Puntos por Pista')
+    axs[0, 1].set_xlabel('Pista')
+    axs[0, 1].set_ylabel('Total de Puntos')
+    axs[0, 1].tick_params(axis='x', rotation=45)
+
+    axs[1, 0].text(0.5, 0.5, f'Promedio de Popularidad: {Popularidad:.2f}',
+                   ha='center', va='center', fontsize=14)
+    axs[1, 0].set_axis_off()
+
+    axs[1, 1].text(0.5, 0.5, f'Artista con Mayor Puntaje: {nombre["Artist_Name"]}',
+                   ha='center', va='center', fontsize=14)
+    axs[1, 1].set_axis_off()
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+    plt.savefig('C:/Users/fredo/datapy/flaskpage/static/images/fractal.png')
+
+    plt.show()
+    return render_template("fractal.html")
